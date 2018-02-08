@@ -1,0 +1,85 @@
+{% extends 'panel/create/create_base.html' %}
+{% block boxtitle %}{% if type == 'create' %}创建{% else %}修改{% endif %}教师{% endblock %}
+{% block boxbody %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <input class="btn btn-warning" type="submit" value="{% if type == 'create' %}创建{% else %}修改{% endif %}">
+        <input type="hidden" name="type" value="{{ type }}">
+        {% if type == 'update' %}
+            <input type="hidden" name="teacher_id" value="{{ teacher.teacher_id }}">
+        {% endif %}
+
+        <div class="form-group">
+            <label>教师姓名:</label>
+            <input type="text" class="form-control" name="name"
+                   value="{% if type == 'update' %}{{ teacher.name }}{% endif %}" required>
+        </div>
+        <div class="form-group">
+            <label>备注:</label>
+            <input type="text" class="form-control" name="description"
+                   value="{% if type == 'update' %}{{ teacher.description }}{% endif %}">
+        </div>
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">关联课程</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-primary" onclick="clickAddLesson();"><i
+                            class="fa fa-plus">添加课程</i></button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+                <table class="table table-striped">
+                    <tbody>
+                    <tr>
+                        <th style="width: 10px">#</th>
+                        <th>班级</th>
+                        <th>班级备注</th>
+                        <th>课程名</th>
+                        <th>课程备注</th>
+                        <th>关联</th>
+                    </tr>
+                    {% if type == 'create' %}
+                        {% for loc in lesson_on_class %}
+                            <tr>
+                                {% for part in loc %}
+                                    <td>{{ part }}</td>
+                                {% endfor %}
+                                <td><input name="check_{{ loc|first }}" type="checkbox"></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for tloc in teacher_lesson_on_class %}
+                            <tr>
+                                {% for part in tloc %}
+                                    <td>{{ part }}</td>
+                                {% endfor %}
+                                <td><input name="check_{{ tloc|first }}" type="checkbox" checked></td>
+                            </tr>
+                        {% endfor %}
+                        {% for lloc in last_lesson_on_class %}
+                            <tr>
+                                {% for part in lloc %}
+                                    <td>{{ part }}</td>
+                                {% endfor %}
+                                <td><input name="check_{{ lloc|first }}" type="checkbox"></td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </form>
+{% endblock %}
+{% block script %}
+    <script>
+        function clickAddLesson() {
+            var new_url = "{% url 'panel:create_lesson' %}?type=create";
+            generateAutoReloadWindow(new_url, 'height=600, width=600, top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=yes,location=no, status=no');
+
+        }
+    </script>
+{% endblock %}

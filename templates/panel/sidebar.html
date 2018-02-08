@@ -1,0 +1,32 @@
+<aside class="main-sidebar">
+
+    <section class="sidebar">
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">功能项</li>
+            <li id="side_class">
+                <a href="{% url 'panel:class_admin' %}"><i class="fa fa-microchip"></i> <span>班级管理</span></a>
+            </li>
+            <li id="side_lesson"><a href="{% url 'panel:lesson_admin' %}"><i class="fa fa-link"></i>
+                <span>课程管理</span></a></li>
+            <li id="side_teacher"><a href="{% url 'panel:teacher_admin' %}"><i class="fa fa-link"></i> <span>教师管理</span></a>
+            </li>
+        </ul>
+    </section>
+</aside>
+<script type="text/javascript">
+    var link = window.location.pathname;
+    var parts = link.split('/');
+    switch (parts[2]) {
+        case "class_admin":
+            $('#side_class').addClass("active");
+            break;
+        case "lesson_admin":
+            $('#side_lesson').addClass("active");
+            break;
+        case "teacher_admin":
+            $('#side_teacher').addClass("active");
+            break;
+        default:
+            break;
+    }
+</script>

@@ -1,0 +1,83 @@
+{% extends 'templates/panel/base.html' %}
+{% block title %}课程管理{% endblock %}
+{% block content %}
+    <style>
+        .my_td{
+            cursor: pointer;
+        }
+        .my_tr:hover{
+            background-color: #dddddd;
+        }
+    </style>
+    <section class="content">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">课程预览</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-danger" onclick="deleteSelectLesson()"><i class="fa fa-trash">删除课程</i>
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="createLesson()"><i class="fa fa-plus">添加课程</i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form id="delete_form" action="{% url 'panel:delete_lesson' %}" method="post">
+                    {% csrf_token %}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th style="width: 40px"><input id="select_all_checkbox" type="checkbox"></th>
+                            <th>#</th>
+                            <th>课程名</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for a_lesson in all_lesson %}
+                            <tr class="my_tr">
+                                <td><input class="choose_lesson" type="checkbox" name="check_{{ a_lesson.lesson_id }}">
+                                </td>
+                                <td class="my_td" onclick="clickUpdateLesson('{{ a_lesson.lesson_id }}')">{{ a_lesson.lesson_id }}</td>
+                                <td class="my_td" onclick="clickUpdateLesson('{{ a_lesson.lesson_id }}')">{{ a_lesson.title }}</td>
+                                <td class="my_td" onclick="clickUpdateLesson('{{ a_lesson.lesson_id }}')">{{ a_lesson.description }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+
+        </div>
+
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+        $('#select_all_checkbox').click(function () {
+            if ($(this).is(':checked')) {
+                $(".choose_lesson").each(function () {
+                    //此处如果用attr，会出现第三次失效的情况
+                    $(this).prop("checked", true);
+                });
+            } else {
+                $(".choose_lesson").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+        function deleteSelectLesson() {
+            $('#delete_form').submit();
+        }
+
+        function createLesson() {
+            var new_url = "{% url 'panel:create_lesson' %}?type=create";
+            generateAutoReloadWindow(new_url, 'height=600, width=600, top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=yes,location=no, status=no');
+        }
+
+        function clickUpdateLesson(lesson_id) {
+            var new_url = "{% url 'panel:create_lesson' %}?type=update&lesson_id=" + lesson_id.toString();
+            generateAutoReloadWindow(new_url, 'height=600, width=600, top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=yes,location=no, status=no');
+        }
+    </script>
+{% endblock %}

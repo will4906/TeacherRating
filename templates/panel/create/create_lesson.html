@@ -1,0 +1,20 @@
+{% extends 'panel/create/create_base.html' %}
+{% block boxtitle %}{% if type == 'create' %}创建{% else %}修改{% endif %}课程{% endblock %}
+{% block boxbody %}
+    <form action="" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label>课程名称:</label>
+        <input type="text" class="form-control" name="title"
+               value="{% if type == 'update' %}{{ lesson.title }}{% endif %}" required>
+    </div>
+    <div class="form-group">
+        <label>备注:</label>
+        <input type="text" class="form-control" name="description"
+               value="{% if type == 'update' %}{{ lesson.description }}{% endif %}">
+    </div>
+    {% if type == 'update' %}<input type="hidden" name="lesson_id" value="{{ lesson.lesson_id }}">{% endif %}
+    <input type="hidden" name="type" value="{{ type }}">
+    <input class="btn btn-warning" type="submit" value="{% if type == 'create' %}创建{% else %}修改{% endif %}">
+    </form>
+{% endblock %}
