@@ -1,0 +1,6 @@
+.pointer_td{
+    cursor: pointer;
+}
+.pointer_tr:hover{
+    background-color: #dddddd;
+}

@@ -5,14 +5,7 @@ from peewee import *
 # from django.db import models
 
 # Create your models here.
-from TeacherRating.settings import BASE_DIR
-
-db = SqliteDatabase(os.path.join(BASE_DIR, 'rating.db'))
-
-
-class BaseModel(Model):
-    class Meta:
-        database = db
+from TeacherRating.models import BaseModel
 
 
 class TheClass(BaseModel):
@@ -74,15 +67,6 @@ class TeacherOnLessonOnClass(BaseModel):
 
     class Meta:
         table_name = 'teacher_on_lesson_on_class'
-
-
-class Test1(models.Model):
-    name = models.CharField(max_length=256)
-
-
-class Test2(models.Model):
-    name = models.CharField(max_length=256)
-    test1 = models.ManyToManyField(Test1)
 
 
 if __name__ == '__main__':

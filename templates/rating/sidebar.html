@@ -1,0 +1,33 @@
+<aside class="main-sidebar">
+
+    <section class="sidebar">
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">功能项</li>
+            <li id="side_event">
+                <a href="{% url 'rating:event_admin' %}"><i class="fa fa-microchip"></i> <span>事件管理</span></a>
+            </li>
+            <li id="side_item">
+                <a href="{% url 'rating:item_admin' %}"><i class="fa fa-microchip"></i> <span>评分项管理</span></a>
+            </li>
+            <li id="side_report"><a href="{% url 'panel:lesson_admin' %}"><i class="fa fa-link"></i>
+                <span>报表分析</span></a></li>
+        </ul>
+    </section>
+</aside>
+<script type="text/javascript">
+    var link = window.location.pathname;
+    var parts = link.split('/');
+    switch (parts[2]) {
+        case "event_admin":
+            $('#side_event').addClass("active");
+            break;
+        case "report_admin":
+            $('#side_report').addClass("active");
+            break;
+        case 'item_admin':
+            $('#side_item').addClass('active');
+            break;
+        default:
+            break;
+    }
+</script>

@@ -1,18 +1,18 @@
 # middleware.py
 from django.middleware.common import CommonMiddleware
 
-from panel.models import db  # Import the peewee database instance.
+from TeacherRating.models import main_db
 
 
 class PeeweeConnectionMiddleware(CommonMiddleware):
     def process_request(self, request):
-        db.connect()
-        cursor = db.cursor()
+        main_db.connect()
+        cursor = main_db.cursor()
         cursor.execute("PRAGMA foreign_keys = ON")
-        db.commit()
+        main_db.commit()
         cursor.close()
 
     def process_response(self, request, response):
-        if not db.is_closed():
-            db.close()
+        if not main_db.is_closed():
+            main_db.close()
         return response

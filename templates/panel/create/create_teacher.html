@@ -29,8 +29,8 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body no-padding">
-                <table class="table table-striped">
-                    <tbody>
+                <table class="table table-striped dataTable">
+                    <thead>
                     <tr>
                         <th style="width: 10px">#</th>
                         <th>班级</th>
@@ -39,6 +39,8 @@
                         <th>课程备注</th>
                         <th>关联</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     {% if type == 'create' %}
                         {% for loc in lesson_on_class %}
                             <tr>
@@ -79,7 +81,6 @@
         function clickAddLesson() {
             var new_url = "{% url 'panel:create_lesson' %}?type=create";
             generateAutoReloadWindow(new_url, 'height=600, width=600, top=0,left=0,toolbar=no,menubar=no,scrollbars=no, resizable=yes,location=no, status=no');
-
         }
     </script>
 {% endblock %}

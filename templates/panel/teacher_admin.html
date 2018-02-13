@@ -25,7 +25,7 @@
             <div class="box-body">
                 <form id="delete_form" action="{% url 'panel:delete_teacher' %}" method="post">
                     {% csrf_token %}
-                    <table class="table">
+                    <table class="table dataTable">
                         <thead>
                         <tr>
                             <th style="width: 40px"><input id="select_all_checkbox" type="checkbox"></th>

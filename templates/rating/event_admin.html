@@ -1,0 +1,93 @@
+{% extends 'rating/base.html' %}
+{% block title %}事件管理{% endblock %}
+{% block content %}
+    <section class="content">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">事件预览</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-danger" onclick="deleteSelectEvent();"><i class="fa fa-trash">删除事件</i>
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="createRatingEvent()"><i class="fa fa-plus">添加事件</i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-body">
+                <form id="delete_form" action="{% url 'rating:delete_event' %}" method="post">
+                    {% csrf_token %}
+                    <table class="table dataTable">
+                        <thead>
+                        <tr>
+                            <th style="width: 40px"><input id="select_all_checkbox" type="checkbox"></th>
+                            <th>#</th>
+                            <th>事件名称</th>
+                            <th>事件状态</th>
+                            <th>评分类型</th>
+                            <th>创建时间</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for a_event in all_event %}
+                            <tr class="pointer_tr">
+                                <td><input class="choose_box" type="checkbox" name="check_{{ a_event.event_id }}">
+                                </td>
+                                <td class="pointer_td"
+                                    onclick="clickEventDetail({{ a_event.event_id }})">{{ a_event.event_id }}</td>
+                                <td class="pointer_td"
+                                    onclick="clickEventDetail({{ a_event.event_id }})">{{ a_event.title }}</td>
+                                <td class="pointer_td"
+                                    onclick="clickEventDetail({{ a_event.event_id }})">{% if a_event.status == 0%}进行中
+                                    {% else %}已完成{% endif %}</td>
+                            <td class="pointer_td"
+                                    onclick="clickEventDetail({{ a_event.event_id }})">{% if a_event.vote_type == 0 %}不记名
+                                    {% else %}记名{% endif %}</td>
+                            <td class="pointer_td"
+                                    onclick="clickEventDetail({{ a_event.event_id }})">{{ a_event.create_time }}</td>
+                                <td class="pointer_td" onclick="clickEventDetail({{ a_event.event_id }})">
+                                    {% if a_event.description == None %}
+                                    {% else %}
+                                        {{ a_event.description }}
+                                    {% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+
+        </div>
+
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+        $('#select_all_checkbox').click(function () {
+            if ($(this).is(':checked')) {
+                $(".choose_box").each(function () {
+                    //此处如果用attr，会出现第三次失效的情况
+                    $(this).prop("checked", true);
+                });
+            } else {
+                $(".choose_box").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+
+        function deleteSelectEvent() {
+            $('#delete_form').submit();
+        }
+
+        function createRatingEvent() {
+            var new_url = "{% url 'rating:create_event' %}";
+            window.location.href=new_url;
+        }
+
+        function clickEventDetail(class_id) {
+            var new_url = "{% url 'rating:create_event' %}?type=update&class_id=" + class_id.toString();
+            window.location.href=new_url;
+        }
+    </script>
+{% endblock %}

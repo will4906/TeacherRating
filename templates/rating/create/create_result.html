@@ -8,32 +8,36 @@
     <link rel="stylesheet" href="{% static 'adminlte/css/AdminLTE.min.css' %}">
     <link rel="stylesheet" href="{% static 'adminlte/css/skins/_all-skins.min.css' %}">
     <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'datatable/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
     {% block link %}{% endblock %}
     <script src="{% static 'jquery/jquery-3.2.1.min.js' %}"></script>
 </head>
 <body>
-<div class="col-md-6">
-    <div class="box box-info">
-        <div class="box-header">
-            <h3 class="box-title">{% block boxtitle %}{% endblock %}</h3>
+<div class="col-lg-3 col-xs-6">
+    {% if result == 'success' %}
+        <div class="small-box bg-green">
+            <h3>创建成功</h3>
+            <a href="javascript:window.close()" class="small-box-footer">关闭页面<i
+                    class="fa fa-arrow-circle-right"></i></a>
         </div>
-        <div class="box-body">
-            {% block boxbody %}{% endblock %}
+    {% else %}
+        <div class="small-box bg-red">
+            <h3>创建失败</h3>
+            <span>失败原因：{{ msg }}</span>
+            <a href="javascript:window.close()" class="small-box-footer">关闭页面<i
+                    class="fa fa-arrow-circle-right"></i></a>
         </div>
-    </div>
+    {% endif %}
 </div>
 
 <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-<script src="{% static 'datatable/datatables.net/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'datatable/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
 <script src="{% static 'adminlte/js/adminlte.min.js' %}"></script>
-<script src="{% static 'common/common.js' %}"></script>
-<script>
-    $('.dataTable').DataTable();
-</script>
 {% block script %}
+    <script>
+        {% if result == 'success' %}
+            window.close();
+        {% endif %}
+    </script>
+
 {% endblock %}
 </body>
 </html>
-

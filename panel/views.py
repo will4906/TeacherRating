@@ -277,7 +277,7 @@ def create_teacher(request, cursor):
                 else:
                     name = request.POST.get('name')
                     description = request.POST.get('description')
-                    Teacher.update({Teacher.name: name, Teacher.description: description}).execute()
+                    Teacher.update({Teacher.name: name, Teacher.description: description}).where(Teacher.teacher_id==teacher_id).execute()
                     TeacherOnLessonOnClass.delete().where(TeacherOnLessonOnClass.teacher_id == teacher_id).execute()
                     for key, value in request.POST.items():
                         if key.find('check') != -1:

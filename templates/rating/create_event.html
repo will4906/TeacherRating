@@ -1,0 +1,72 @@
+{% extends 'rating/create_base.html' %}
+{% block boxtitle %}创建事件{% endblock %}
+{% block boxbody %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <input class="btn btn-warning" type="submit" value="创建">
+        <div class="form-group">
+            <label>事件名称:</label>
+            <input type="text" class="form-control" name="title" required>
+        </div>
+        <div class="form-group">
+            <label>投票类型(目前仅支持不记名形式):</label>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="vote_type" id="optionsRadios1" value="0" checked="">
+                    不记名形式
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="vote_type" id="optionsRadios2" value="1" disabled="">
+                    记名形式
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>备注：</label>
+            <input type="text" class="form-control" name="description">
+        </div>
+        <input type="hidden" name="classification" value="classification_class">
+        <div class="nav-tabs-custom">
+            <label>分类方式(目前仅支持按班级分类)：</label>
+            <ul class="nav nav-tabs">
+                <li class="active" onclick="clickClassificationLi('classification_class')"><a href="#tab_1" data-toggle="tab" aria-expanded="true">班级</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1">
+                    <b>所有班级:</b>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>班级</th>
+                            <th>班级备注</th>
+                            <th>选择</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for a_class in all_class %}
+                            <tr>
+                                <td>{{ a_class.class_id }}</td>
+                                <td>{{ a_class.title }}</td>
+                                <td>{{ a_class.description }}</td>
+                                <td><input name="check_{{ a_class.class_id }}" type="checkbox"></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <!-- /.tab-content -->
+        </div>
+    </form>
+{% endblock %}
+{% block script %}
+    <script>
+        function clickClassificationLi(classification_type) {
+            
+        }
+    </script>
+{% endblock %}
