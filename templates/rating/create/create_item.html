@@ -1,10 +1,162 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'panel/create/create_base.html' %}
+{% block boxtitle %}{% if type == 'create' %}创建{% else %}修改{% endif %}评分项{% endblock %}
+{% block boxbody %}
+    <form id="main-form" action="" method="post" onsubmit="return checkRatingLevelLength();">
+        {% csrf_token %}
+        <input class="btn btn-warning" type="submit" value="{% if type == 'create' %}创建{% else %}修改{% endif %}">
+        <input type="hidden" name="type" value="{{ type }}">
+        {% if type == 'update' %}
+            <input type="hidden" name="class_id" value="{{ the_class.class_id }}">
+        {% endif %}
 
-</body>
-</html>
+        <div class="form-group">
+            <label>评分项名称:</label>
+            <input type="text" class="form-control" name="title"
+                   value="{% if type == 'update' %}{{ the_class.title }}{% endif %}" required>
+        </div>
+        <div class="form-group">
+            <label>备注:</label>
+            <input type="text" class="form-control" name="description"
+                   value="{% if type == 'update' %}{{ the_class.description }}{% endif %}">
+        </div>
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">关联评分级别</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-default">
+                        添加评分级别
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>级别名称</th>
+                        <th>级别分值</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="level_body">
+                    {% if type == 'create' %}
+
+                    {% else %}
+                        {% for loc in lesson_on_class %}
+                            <tr>
+                                {% for part in loc %}
+                                    <td>{{ part }}</td>
+                                {% endfor %}
+                                <td><input name="check_{{ loc|first }}" type="checkbox" checked></td>
+                            </tr>
+                        {% endfor %}
+                        {% for lnoc in lesson_not_on_class %}
+                            <tr>
+                                {% for part in lnoc %}
+                                    <td>{{ part }}</td>
+                                {% endfor %}
+                                <td><input name="check_{{ lnoc|first }}" type="checkbox"></td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </form>
+    <div class="modal fade" id="modal-default" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">评分级别细节</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>评分级别名称:</label>
+                        <input type="text" class="form-control" id="score_name">
+                    </div>
+                    <div class="form-group">
+                        <label>评分级别分值:</label>
+                        <input type="number" class="form-control" id="score_score">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onAddRatingItem();">添加
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal modal-danger fade" id="modal-danger" style="display: none;">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeDangerModel();">
+                  <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">评分级别缺失</h4>
+              </div>
+              <div class="modal-body">
+                <p>下方评分级别分类数量必须大于0.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-dismiss="modal" onclick="closeDangerModel();">关闭</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+{% endblock %}
+{% block script %}
+    <script>
+        var rowId = 0;
+        var rowLength = 0;
+
+        function onAddRatingItem() {
+            var scoreName = $('#score_name').val();
+            var scoreScore = $('#score_score').val();
+            $('#score_name').val("");
+            $('#score_score').val("");
+            if (scoreName.length !== 0 && scoreScore.length !== 0) {
+                var tr = "<tr id=\"score_tr_" + rowId.toString() + "\">";
+                var td_name = "<td>" + scoreName.toString() + "</td>";
+                var td_score = "<td>" + scoreScore.toString() + "</td>";
+                var td_remove = "<td><span class=\"fa fa-trash\" style=\"color: red; cursor: pointer;\" onclick=\"deleteRatingLevel(" + rowId.toString() + ");\">删除</span></td>";
+                tr += td_name + td_score + td_remove + "</tr>";
+                $('#level_body').append(tr);
+                var inputName = "<input type=\"hidden\" name=\"level_name_" + rowId.toString() + "\" value=\"" + scoreName.toString() + "\">";
+                var inputScore = "<input type=\"hidden\" name=\"level_score_" + rowId.toString() + "\" value=\"" + scoreScore.toString() + "\">";
+                $('#main-form').append(inputName);
+                $('#main-form').append(inputScore);
+                rowId += 1;
+                rowLength += 1;
+            }
+        }
+
+        function deleteRatingLevel(rowId) {
+            $("input[name='level_name_" + rowId.toString() + "']").remove();
+            $("input[name='level_score_" + rowId.toString() + "']").remove();
+            $("#score_tr_" + rowId.toString()).remove();
+            rowLength -= 1;
+        }
+
+        function checkRatingLevelLength() {
+            if (rowLength === 0){
+                $('#modal-danger').addClass('in').show();
+                return false;
+            }
+            return true;
+        }
+
+        function closeDangerModel() {
+            $('#modal-danger').removeClass('in').hide();
+        }
+    </script>
+{% endblock %}

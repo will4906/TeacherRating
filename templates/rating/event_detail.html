@@ -1,0 +1,43 @@
+{% extends 'rating/base.html' %}
+{% block title %}事件详情{% endblock %}
+{% block content %}
+    <section class="content-header">
+        <h1>
+            {{ rating_event.title }}
+            <small>{{ rating_event.description }}</small>
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        基本信息
+                    </div>
+                    <div class="box-body">
+                        <div class="col-md-6">
+                            <ul>
+                                <li><label>创建时间：</label><span>{{ rating_event.create_time }}</span></li>
+                                <li><label>事件状态：</label><span>{% if rating_event.status == 0 %}进行中
+                                {% else %}已完成{% endif %}</span></li>
+                                <li><label>投票类型：</label><span>{% if rating_event.vote_type == 0 %}不记名投票{% else %}
+                                    记名投票{% endif %}</span></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                <li><label>创建时间：</label><span>{{ rating_event.create_time }}</span></li>
+                                <li><label>事件状态：</label><span>{% if rating_event.status == 0 %}进行中
+                                {% else %}已完成{% endif %}</span></li>
+                                <li><label>投票类型：</label><span>{% if rating_event.vote_type == 0 %}不记名投票{% else %}
+                                    记名投票{% endif %}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+{% endblock %}

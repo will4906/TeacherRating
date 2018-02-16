@@ -44,6 +44,7 @@ class LogRatingItem(BaseModel):
     评分项目记录，e.g. 教师讲课效果、教师纪律管理等
     """
     item_id = PrimaryKeyField()
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
     title = CharField(max_length=256)
     description = CharField(max_length=256, null=True)
 
@@ -59,7 +60,6 @@ class RatingLevel(BaseModel):
     item_id = ForeignKeyField(RatingItem, on_delete='CASCADE')
     title = CharField(max_length=256)
     score = DecimalField()
-    description = CharField(max_length=256, null=True)
 
     class Meta:
         table_name = 'rating_level'
@@ -73,7 +73,6 @@ class LogRatingLevel(BaseModel):
     item_id = ForeignKeyField(LogRatingItem, on_delete='CASCADE')
     title = CharField(max_length=256)
     score = DecimalField()
-    description = CharField(max_length=256, null=True)
 
     class Meta:
         table_name = 'log_rating_level'
@@ -84,8 +83,8 @@ class LogItemOnEvent(BaseModel):
     评分项与评分事件的绑定
     """
     ie_id = PrimaryKeyField()
-    event_id = ForeignKeyField(RatingEvent)
-    item_id = ForeignKeyField(LogRatingItem)
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
+    item_id = ForeignKeyField(LogRatingItem, on_delete='CASCADE')
 
     class Meta:
         table_name = 'log_item_on_event'
@@ -96,6 +95,7 @@ class LogTheClass(BaseModel):
     班级记录
     """
     class_id = PrimaryKeyField()
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
     title = CharField(max_length=256)
     head_teacher = CharField(max_length=256)  # 描述性信息，不与教师表关联
     description = CharField(max_length=256, null=True)
@@ -109,6 +109,7 @@ class LogLesson(BaseModel):
     课程记录
     """
     lesson_id = PrimaryKeyField()
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
     title = CharField(max_length=256)
     description = CharField(max_length=256, null=True)
 
@@ -121,6 +122,7 @@ class LogLessonOnClass(BaseModel):
     班级课程记录
     """
     lc_id = PrimaryKeyField()
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
     class_id = ForeignKeyField(LogTheClass, on_delete='CASCADE')
     lesson_id = ForeignKeyField(LogLesson, on_delete='CASCADE')
 
@@ -133,6 +135,7 @@ class LogTeacher(BaseModel):
     教师记录
     """
     teacher_id = PrimaryKeyField()
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
     name = CharField(max_length=256)
     description = CharField(max_length=256, null=True)
 
@@ -145,6 +148,7 @@ class LogTeacherOnLessonOnClass(BaseModel):
     教师课程记录
     """
     tlc_id = PrimaryKeyField()
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
     teacher_id = ForeignKeyField(LogTeacher, on_delete='CASCADE')
     lc_id = ForeignKeyField(LogLessonOnClass, on_delete='CASCADE', unique=True)
 
@@ -157,8 +161,8 @@ class EventOnTeacherOnLessonOnClass(BaseModel):
     需要评分的课程与评分事件的绑定
     """
     id = PrimaryKeyField()
-    event_id = ForeignKeyField(RatingEvent)
-    tlc_id = ForeignKeyField(LogTeacherOnLessonOnClass)
+    event_id = ForeignKeyField(RatingEvent, on_delete='CASCADE')
+    tlc_id = ForeignKeyField(LogTeacherOnLessonOnClass, on_delete='CASCADE')
     votes = IntegerField(default=10)
 
     class Meta:

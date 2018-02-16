@@ -14,5 +14,6 @@ class PeeweeConnectionMiddleware(CommonMiddleware):
 
     def process_response(self, request, response):
         if not main_db.is_closed():
+            main_db.commit()
             main_db.close()
         return response

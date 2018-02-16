@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'registration',
     'panel',
     'rating',
+    'questionnaire',
 ]
 
 MIDDLEWARE = [

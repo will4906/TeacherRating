@@ -85,8 +85,8 @@
             window.location.href=new_url;
         }
 
-        function clickEventDetail(class_id) {
-            var new_url = "{% url 'rating:create_event' %}?type=update&class_id=" + class_id.toString();
+        function clickEventDetail(event_id) {
+            var new_url = "{% url 'rating:event_detail' %}?event_id=" + event_id.toString();
             window.location.href=new_url;
         }
     </script>
