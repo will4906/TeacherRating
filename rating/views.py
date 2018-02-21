@@ -37,8 +37,9 @@ def get_paired_last(paired_list, source):
     return None
 
 
+@database_using
 @login_required()
-def create_event(request):
+def create_event(request, cursor):
     """
     创建评分事件，TODO:代码过长需要简化
     :param request:
@@ -76,6 +77,20 @@ def create_event(request):
                                                                head_teacher=a_class.get('head_teacher'),
                                                                description=a_class.get('description'))
                             paired_class_list.append((a_class.get('class_id'), log_the_class.class_id))
+
+                if key.find('item_') != -1:
+                    item_list = RatingItem.select().where(RatingItem.item_id == key.split('_')[-1]).dicts()
+                    for rating_item in item_list:
+                        # 这里只会有一个Item，所以循环没有影响。
+                        log_rating_item = LogRatingItem.create(title=rating_item.get('title'),
+                                                               event_id=rating_event.event_id,
+                                                               description=rating_item.get('description'))
+                        LogItemOnEvent.create(event_id=rating_event.event_id, item_id=log_rating_item.item_id)
+                        level_list = RatingLevel.select().where(
+                            RatingLevel.item_id == rating_item.get('item_id')).dicts()
+                        for level in level_list:
+                            LogRatingLevel.create(item_id=log_rating_item.item_id, title=level.get('title'),
+                                                  score=level.get('score'))
 
             # 创建课程log
             paird_lesson_list = []
@@ -128,20 +143,27 @@ def create_event(request):
                                                          tlc_id=ltoloc.tlc_id, votes=votes)
                     paired_tlc_list.append((toloc.get('tlc_id'), ltoloc.tlc_id))
 
-                if key.find('item_') != -1:
-                    item_list = RatingItem.select().where(RatingItem.item_id == key.split('_')[-1]).dicts()
-                    for rating_item in item_list:
-                        # 这里只会有一个Item，所以循环没有影响。
-                        log_rating_item = LogRatingItem.create(title=rating_item.get('title'),
-                                                               event_id=rating_event.event_id,
-                                                               description=rating_item.get('description'))
-                        LogItemOnEvent.create(event_id=rating_event.event_id, item_id=log_rating_item.item_id)
-                        level_list = RatingLevel.select().where(
-                            RatingLevel.item_id == rating_item.get('item_id')).dicts()
-                        for level in level_list:
-                            LogRatingLevel.create(item_id=log_rating_item.item_id, title=level.get('title'),
-                                                  score=level.get('score'))
-            return HttpResponseRedirect(reverse('rating:event_admin'))
+        cursor.execute(
+            '''
+            DELETE FROM log_teachers 
+            WHERE 
+            log_teachers.event_id = %d
+            AND
+            log_teachers.teacher_id NOT IN 
+            (SELECT teacher_id FROM log_teacher_on_lesson_on_class AS t1 WHERE t1.event_id=%d)
+            ''' % (rating_event.event_id, rating_event.event_id)
+        )
+        cursor.execute(
+            '''
+            DELETE FROM log_lessons
+            WHERE 
+            log_lessons.event_id = %d
+            AND 
+            log_lessons.lesson_id NOT IN 
+            (SELECT lesson_id FROM log_lesson_on_class WHERE event_id = %d)
+            ''' % (rating_event.event_id, rating_event.event_id)
+        )
+        return HttpResponseRedirect(reverse('rating:event_admin'))
     return render(request, 'rating/create_event.html')
 
 
