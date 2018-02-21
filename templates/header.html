@@ -19,6 +19,7 @@
                     <li id="nav_home"><a href="{% url 'index' %}">首页</a></li>
                     <li id="nav_panel"><a href="{% url 'panel:index' %}">管理</a></li>
                     <li id="nav_rating"><a href="{% url 'rating:index' %}">评分</a></li>
+                    <li id="nav_questionnaire"><a href="{% url 'questionnaire:index' %}">问卷</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}

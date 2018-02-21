@@ -26,7 +26,10 @@ urlpatterns = [
     url(r'^accounts/profile/',
         TemplateView.as_view(template_name='registration/profile.html'),
         name='profile'),
+    url(r'^captcha/', include('captcha.urls')),
+    url(r'^check_captcha$', views.check_captcha, name='check_captcha'),
     url(r'^panel/', include(('panel.urls', 'panel'), namespace='panel')),
     url(r'^rating/', include(('rating.urls', 'rating'), namespace='rating')),
+    url(r'^questionnaire/', include(('questionnaire.urls', 'questionnaire'), namespace='questionnaire')),
     path('admin/', admin.site.urls),
 ]

@@ -1,0 +1,125 @@
+{% extends 'questionnaire/base.html' %}
+{% block title %}问卷详情{% endblock %}
+{% block content %}
+    <section class="content">
+        <form id="main-form" action="" method="post" onsubmit="disableSubmitButton();" onkeydown="if(event.keyCode===13){return false;}">
+            <input id="submit_input" type="submit" style="display: none;">
+            <div class="row">
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-6">
+                    {% csrf_token %}
+                    {% if classification == 0 %}
+                        {% for main in main_list %}
+                            {% with ltoloc=main|first teacher=main|slice:"1:2"|first the_class=main|slice:"2:3"|first lesson=main|slice:"3:4"|first item_list=main|slice:"4:5"|first %}
+                                <div class="box box-warning">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">{{ the_class.title }}-{{ lesson.title }}
+                                            {% if lesson.description != '' %}({{ lesson.description }})
+                                            {% endif %}-{{ teacher.name }}</h3>
+                                    </div>
+                                    <div class="box-body" style="">
+                                        {% for part in item_list %}
+                                            {% with rating_item=part|first level_list=part|last %}
+                                                <p>{{ rating_item.title }}</p>
+                                                <div class="form-group">
+                                                    <div class="radio">
+                                                        {% for rating_level in level_list %}
+                                                            <label>
+                                                                <input type="radio"
+                                                                       name="radio_{{ ltoloc.tlc_id }}_{{ rating_item.item_id }}"
+                                                                       value="{{ rating_level.level_id }}"
+                                                                       required="required">
+                                                                {{ rating_level.title }}
+                                                            </label>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endwith %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="box box-success">
+                        <div class="box box-body">
+                            <label>请完成验证码并提交</label>
+                            {{ captcha.captcha }}
+                            <button class='js-captcha-refresh'>更换验证码</button>
+                            <button id="submit_button" class="btn btn-success" type="button" style="width: 100%">提交
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+        </form>
+        <div class="modal modal-danger fade" id="modal-danger" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                onclick="closeDangerModel();">
+                            <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">验证码错误</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="err_msg"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" data-dismiss="modal"
+                                onclick="closeDangerModel();">关闭
+                        </button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+        $('.js-captcha-refresh').click(function () {
+            $form = $(this).parents('form');
+            $.getJSON("{% url 'captcha-refresh' %}", {}, function (json) {
+                $('.captcha').attr('src', json.image_url);
+                $('#id_captcha_0').val(json.key)
+            });
+            return false;
+        });
+        $('#submit_button').click(function () {
+            var captcha_1 = $('#id_captcha_1').val();
+            if (captcha_1.length === 0) {
+                $('#err_msg').html("请输入验证码");
+                $('#modal-danger').addClass('in').show();
+            } else {
+                $.ajax({
+                    url: "{% url 'check_captcha' %}",
+                    data: {
+                        'captcha_0': $("#id_captcha_0").val(),
+                        'captcha_1': captcha_1
+                    },
+                    type: 'get',
+                    success: function (resp) {
+                        if (resp.result === 'ok') {
+                            $("#submit_input").click();
+                        } else {
+                            $('#err_msg').html("验证码错误");
+                            $('#modal-danger').addClass('in').show();
+                            $('.js-captcha-refresh').click();
+                        }
+                    }
+                })
+            }
+        });
+        function closeDangerModel() {
+            $('#modal-danger').removeClass('in').hide();
+        }
+        function disableSubmitButton() {
+            $('#submit_button').prop('disabled', true);
+        }
+    </script>
+{% endblock %}

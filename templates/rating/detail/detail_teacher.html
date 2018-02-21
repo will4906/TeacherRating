@@ -1,0 +1,67 @@
+{% extends 'rating/detail/detail_base.html' %}
+{% block title %}教师详情统计{% endblock %}
+{% block content %}
+    <style>
+        table th, table td {
+            border: #0f0f0f 1px solid;
+        }
+
+        table {
+            margin: 0 auto;
+        }
+    </style>
+    <section class="content">
+        <div class="row" align="center">
+            <h1>{{ rating_event.title }}</h1>
+            <span class="pull-right">{{ rating_event.description }}</span>
+            <br>
+            <span class="pull-right">{{ rating_event.create_time|date:"Y年m月d日" }}</span>
+        </div>
+        <div class="row">
+            <table style="text-align: center">
+                <thead>
+                <tr>
+                    <th>任课教师</th>
+                    <th>班级</th>
+                    <th>课程</th>
+                    {% for rating_item in rating_item_list %}
+                        <th><span>{{ rating_item.title }}</span><span>({{ rating_item.max_score }})</span></th>
+                    {% endfor %}
+                    <th>总分({{ sum_score }})</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for tlc in info_tlc_list %}
+                    {% for answer in tlc|first %}
+                        {% with teacher=answer|slice:"0:1"|first the_class=answer|slice:"1:2"|first lesson=answer|slice:"2:3"|first item_list=answer|slice:"3:4"|first single=answer|slice:"4:5"|first%}
+                            <tr>
+                                <td>{{ teacher.name }}{% if teacher.description != "" %}({{ teacher.description }})
+                                {% endif %}</td>
+                                <td>{{ the_class.title }}{% if the_class.description != "" %}({{ the_class.description }})
+                                {% endif %}</td>
+                                <td>{{ lesson.title }}{% if lesson.description != "" %}({{ lesson.description }})
+                                {% endif %}</td>
+                                {% for answer_item in item_list %}
+                                    {% with level=answer_item|last %}
+                                        <td>{{ level.score }}</td>
+                                    {% endwith %}
+                                {% endfor %}
+                                <td>{{ single }}</td>
+                        {% endwith %}
+                    {% endfor %}
+                    <tr>
+                        <td>#</td>
+                        <td></td>
+                        <td></td>
+                        {% for rating_item in tlc|slice:"1:2"|first %}
+                            <td>{{ rating_item }}</td>
+                        {% endfor %}
+                        <td>{{ tlc|last }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+{% endblock %}

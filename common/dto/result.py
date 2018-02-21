@@ -8,7 +8,10 @@ Created on 2017/3/19
 
 class Result:
 
-    def __init__(self, result='ok', errMsg=None, parm=None):
+    OK = 'ok'
+    ERR = 'err'
+
+    def __init__(self, result=OK, errMsg=None, parm=None):
         self.result = result
         self.errMsg = errMsg
         self.parm = parm

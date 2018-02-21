@@ -20,6 +20,7 @@ class RatingEvent(BaseModel):
     title = CharField(max_length=256)
     status = IntegerField(default=0)    # 0:投票中， 1:投票结束
     vote_type = IntegerField(default=0)     # 0:不记名投票， 1：记名投票
+    classification = IntegerField()  # 分类方式: 0->班级
     create_time = DateTimeField(default=datetime.datetime.now)
     description = CharField(max_length=256, null=True)
 

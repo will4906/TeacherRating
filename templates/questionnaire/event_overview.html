@@ -1,0 +1,34 @@
+{% extends 'questionnaire/base.html' %}
+{% block title %}问卷预览{% endblock %}
+{% block content %}
+    <section class="content">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="box box-info">
+
+                    <div class="box-header">
+                        {% if classification == 0 %}
+                            选择班级
+                        {% endif %}
+                    </div>
+                    <div class="box-body">
+                        <ul>
+                            {% if classification == 0 %}
+                                {% for overview in overview_list %}
+                                    <li>
+                                        <a href="{% url 'questionnaire:event_detail' event_id classification overview.class_id %}">
+                                            {{ overview.title }}{% if overview.description != '' %}
+                                                ({{ overview.description }})
+                                            {% endif %}</a></li>
+                                {% endfor %}
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    </section>
+{% endblock %}

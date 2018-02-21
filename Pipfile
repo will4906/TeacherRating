@@ -10,6 +10,7 @@ name = "pypi"
 django = "*"
 peewee = "*"
 django-registration-redux = "*"
+django-simple-captcha = "*"
 
 
 [dev-packages]
