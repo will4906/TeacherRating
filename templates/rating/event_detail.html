@@ -51,10 +51,10 @@
                                                            href="{% url 'rating:detail_class' %}?event_id={{ rating_event.event_id }}">详情</a>
                                 </li>
                                 <li><label>教师表格：</label><a class="btn btn-primary"
-                                                           href="{% url 'rating:detail_teacher' %}?event_id={{ rating_event.event_id }}">详情</a>
+                                                           href="{% url 'rating:detail_answer' %}?event_id={{ rating_event.event_id }}">详情</a>
                                 </li>
-                                <li><label>投票类型：</label><span>{% if rating_event.vote_type == 0 %}不记名投票{% else %}
-                                    记名投票{% endif %}</span></li>
+                                <li><label>教师均分表格：</label><a class="btn btn-primary"
+                                                           href="{% url 'rating:detail_aver' %}?event_id={{ rating_event.event_id }}">详情</a></li>
                             </ul>
                         </div>
                     </div>

@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^item_admin/create_item$', views.create_item, name='create_item'),
     url(r'^item_admin/delete_item$', views.delete_item, name='delete_item'),
     url(r'^event_admin/event_detail/detail_class$', views.detail_class, name='detail_class'),
-    url(r'^event_admin/event_detail/detail_teacher$', views.detail_teacher, name='detail_teacher'),
+    url(r'^event_admin/event_detail/detail_answer$', views.detail_answer, name='detail_answer'),
+    url(r'^event_admin/event_detail/detail_aver$', views.detail_aver, name='detail_aver'),
 ]

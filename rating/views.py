@@ -320,65 +320,117 @@ def detail_class(request, cursor):
 
 @database_using
 @login_required()
-def detail_teacher(request, cursor):
+def detail_answer(request, cursor):
+    event_id = request.GET.get('event_id')
+    rating_event, rating_item_list, sum_score = base_info(request, cursor, event_id)
+    class_list = LogTheClass.select().where(LogTheClass.event_id == event_id).dicts()
+    info_tlc_list = []
+    for the_class in class_list:
+        lesson_class_list = LogLessonOnClass.select().where(
+            LogLessonOnClass.class_id == the_class.get('class_id')).dicts()
+        for lesson_class in lesson_class_list:
+            try:
+                teacher_lesson_class = LogTeacherOnLessonOnClass.select().where(
+                    LogTeacherOnLessonOnClass.lc_id == lesson_class.get('lc_id')).dicts()[0]  # 这里只有一个和没有的情况
+                teacher = LogTeacher.select().where(
+                    LogTeacher.teacher_id == teacher_lesson_class.get('teacher_id')
+                ).dicts()[0]
+                lesson = LogLesson.select().where(
+                    LogLesson.lesson_id == lesson_class.get('lesson_id')
+                ).dicts()[0]
+                anwer_list = AnswerSheet.select().where(AnswerSheet.event_id == event_id).dicts()
+                info_answer_list = []
+                aver_rating_list = []
+                for answer in anwer_list:
+                    single_sum = 0
+                    info_rating_item_list = []
+                    add_answer = True
+                    for i, rating_item in enumerate(rating_item_list):
+                        try:
+                            answer_item = AnswerItem.select().where(
+                                AnswerItem.tlc_id == teacher_lesson_class.get('tlc_id'),
+                                AnswerItem.answer_id == answer.get('answer_id'),
+                                AnswerItem.log_item_id == rating_item.get('item_id')).dicts()[0]
+                            rating_level = LogRatingLevel.select().where(
+                                LogRatingLevel.level_id == answer_item.get('log_level_id')
+                            ).dicts()[0]
+                            single_sum += rating_level.get('score')
+                            info_rating_item_list.append((answer_item, rating_level))
+                            try:
+                                rating_score = aver_rating_list[i]
+                                aver_rating_list[i] = (rating_score[0] + rating_level.get('score'), rating_score[1] + 1)
+                            except Exception as e:
+                                aver_rating_list.append((rating_level.get('score'), 1))
+                        except:
+                            add_answer = False
+                    if add_answer is True:
+                        info_answer_list.append(
+                            (teacher, the_class, lesson, info_rating_item_list, single_sum))
+                if info_answer_list:
+                    aver_list = []
+                    aver_sum = decimal.Decimal(0)
+                    for i, aver in enumerate(aver_rating_list):
+                        aver_score = aver[0] / decimal.Decimal(aver[1])
+                        aver_list.append(round(aver_score, 2))
+                        aver_sum += aver_score
+                    info_tlc_list.append((info_answer_list, aver_list, round(aver_sum, 2)))
+            except:
+                pass
+    return render(request, 'rating/detail/detail_answer.html',
+                  {'rating_event': rating_event, 'rating_item_list': rating_item_list,
+                   'sum_score': sum_score,
+                   'info_tlc_list': info_tlc_list})
+
+
+@database_using
+@login_required()
+def detail_aver(request, cursor):
     event_id = request.GET.get('event_id')
     rating_event, rating_item_list, sum_score = base_info(request, cursor, event_id)
     teacher_list = LogTeacher.select().where(LogTeacher.event_id == event_id).dicts()
     info_tlc_list = []
 
     for teacher in teacher_list:
-        teacher_lesson_class_list = LogTeacherOnLessonOnClass.select().where(
-            LogTeacherOnLessonOnClass.teacher_id == teacher.get('teacher_id')).dicts()
-        for teacher_lesson_class in teacher_lesson_class_list:
-            lesson_class = \
-                LogLessonOnClass.select().where(LogLessonOnClass.lc_id == teacher_lesson_class.get('lc_id')).dicts()[0]
-            the_class = LogTheClass.select().where(
-                LogTheClass.class_id == lesson_class.get('class_id')
-            ).dicts()[0]
-            print()
-            print(teacher, the_class)
-            lesson = LogLesson.select().where(
-                LogLesson.lesson_id == lesson_class.get('lesson_id')
-            ).dicts()[0]
-            answer_list = AnswerSheet.select().where(AnswerSheet.event_id == event_id).dicts()
-            info_answer_list = []
-            add_tlc = True
+        info_lesson_class_list = []
+        ltlc_list = LogTeacherOnLessonOnClass.select().where(LogTeacherOnLessonOnClass.teacher_id == teacher.get('teacher_id')).dicts()
+        for ltlc in ltlc_list:
+            lesson_class = LogLessonOnClass.select().where(LogLessonOnClass.lc_id == ltlc.get('lc_id')).dicts()[0]
+            the_class = LogTheClass.select().where(LogTheClass.class_id == lesson_class.get('class_id')).dicts()[0]
+            lesson = LogLesson.select().where(LogLesson.lesson_id == lesson_class.get('lesson_id')).dicts()[0]
             aver_rating_list = []
-            for answer in answer_list:
-                single_sum = 0
-                info_raing_item_list = []
-                add_answer = True
-                for i, rating_item in enumerate(rating_item_list):
+            sum_aver_score = 0
+            for i, rating_item in enumerate(rating_item_list):
+                answer_item_list = AnswerItem.select().where(
+                    AnswerItem.tlc_id == ltlc.get('tlc_id'),
+                    AnswerItem.log_item_id == rating_item.get('item_id')).dicts()
+                sum_score = 0
+                for answer_item in answer_item_list:
+                    rating_level = LogRatingLevel.select().where(LogRatingLevel.level_id == answer_item.get('log_level_id')).dicts()[0]
+                    sum_score += rating_level.get('score')
+                aver_score = sum_score / len(answer_item_list)
+                aver_rating_list.append(round(aver_score, 2))
+                sum_aver_score += aver_score
+            info_lesson_class_list.append((teacher, the_class, lesson, aver_rating_list, round(sum_aver_score, 2)))
+        if info_lesson_class_list:
+            aver_whole_rating_list = []
+            for info_lesson_class in info_lesson_class_list:
+                for i, aver_rating in enumerate(info_lesson_class[3]):
                     try:
-                        answer_item = AnswerItem.select().where(
-                            AnswerItem.tlc_id == teacher_lesson_class.get('tlc_id'),
-                            AnswerItem.answer_id == answer.get('answer_id'),
-                            AnswerItem.log_item_id == rating_item.get('item_id')).dicts()[0]
-                        rating_level = LogRatingLevel.select().where(
-                            LogRatingLevel.level_id == answer_item.get('log_level_id')
-                        ).dicts()[0]
-                        single_sum += rating_level.get('score')
-                        info_raing_item_list.append((answer_item, rating_level))
-                        try:
-                            rating_score = aver_rating_list[i]
-                            aver_rating_list[i] = (rating_score[0] + rating_level.get('score'), rating_score[1] + 1)
-                        except Exception as e:
-                            aver_rating_list.append((rating_level.get('score'), 1))
-                    except Exception as e:
-                        add_answer = False
-                if add_answer is True:
-                    info_answer_list.append(
-                        (teacher, the_class, lesson, info_raing_item_list, single_sum))
-            if info_answer_list:
-                aver_list = []
-                aver_sum = decimal.Decimal(0)
-                for i, aver in enumerate(aver_rating_list):
-                    aver_score = aver[0] / decimal.Decimal(aver[1])
-                    aver_list.append(aver_score)
-                    aver_sum += aver_score
-                info_tlc_list.append((info_answer_list, aver_list, aver_sum))
+                        aver_whole = aver_whole_rating_list[i]
+                        aver_whole_rating_list[i] = (aver_whole[0] + aver_rating, aver_whole[1] + 1)
+                    except:
+                        aver_whole_rating_list.append((aver_rating, 1))
 
-    return render(request, 'rating/detail/detail_teacher.html',
+            print(len(aver_whole_rating_list))
+            new_aver_whole_list = []
+            new_aver_sum = 0
+            for aver_whole in aver_whole_rating_list:
+                new_aver = round(aver_whole[0] / aver_whole[1], 2)
+                new_aver_whole_list.append(new_aver)
+                new_aver_sum += new_aver
+            info_tlc_list.append((info_lesson_class_list, new_aver_whole_list, new_aver_sum))
+
+    return render(request, 'rating/detail/detail_aver.html',
                   {'rating_event': rating_event, 'rating_item_list': rating_item_list,
                    'sum_score': sum_score,
                    'info_tlc_list': info_tlc_list})
