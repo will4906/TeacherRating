@@ -407,7 +407,11 @@ def detail_aver(request, cursor):
                 for answer_item in answer_item_list:
                     rating_level = LogRatingLevel.select().where(LogRatingLevel.level_id == answer_item.get('log_level_id')).dicts()[0]
                     sum_score += rating_level.get('score')
-                aver_score = sum_score / len(answer_item_list)
+                division = len(answer_item_list)
+                if division != 0:
+                    aver_score = sum_score / division
+                else:
+                    aver_score = 0
                 aver_rating_list.append(round(aver_score, 2))
                 sum_aver_score += aver_score
             info_lesson_class_list.append((teacher, the_class, lesson, aver_rating_list, round(sum_aver_score, 2)))
